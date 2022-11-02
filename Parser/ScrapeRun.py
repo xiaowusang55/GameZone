@@ -4,8 +4,8 @@ import datetime
 import uuid
 
 from Parser import Parser
-import mysql.connector
 
+from utils.DBmsConnect import DBmsConnect
 
 if __name__ == '__main__':
     # create a parser
@@ -19,8 +19,8 @@ if __name__ == '__main__':
     """
     regx = r"""
         <a\s
-        (href=.*?)\s.*?>       # find href attribute with () group
-        <img\s(src=.*?)\s.*?>  # find src attribute with () group
+        href="(.*?)"\s.*?>       # find href attribute with () group
+        <img\ssrc="(.*?)"\s.*?>  # find src attribute with () group
         <div\s.*?>(.*?)</div>  # find contents of tag with () group
         <p>(.*?)</p>           # find contents of tag with () group
         </a>
@@ -38,17 +38,12 @@ if __name__ == '__main__':
                 original_order_list[int(num.group()) - 1] = os.path.join(root, file)
 
     # connect to mysql
-    dbms = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='12345678',
-        database='game_zone'
-    )
+    dbms = DBmsConnect().dbms
     # create cursor
     mycursor = dbms.cursor()
 
     # create table
-    # mycursor.execute('CREATE TABLE game_links (id INT AUTO_INCREMENT PRIMARY KEY, game_id VARCHAR(225), detail_url VARCHAR(225), cover_url VARCHAR(225), game_rate VARCHAR(225), game_name VARCHAR(225), created_time DATETIME, updated_time DATETIME)')
+    mycursor.execute('CREATE TABLE game_links (id INT AUTO_INCREMENT PRIMARY KEY, game_id VARCHAR(225), detail_url VARCHAR(225), cover_url VARCHAR(225), game_rate VARCHAR(225), game_name VARCHAR(225), created_time DATETIME, updated_time DATETIME)')
 
     sql = 'INSERT INTO game_links (game_id, detail_url, cover_url, game_rate, game_name, created_time, updated_time) VALUES (%s, %s, %s, %s, %s, %s, %s)'
 

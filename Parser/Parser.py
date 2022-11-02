@@ -24,8 +24,8 @@ if __name__ == '__main__':
     lp = Parser()
     regxe = r"""
     <a\s
-    (href=.*?)\s.*?>       # find href attribute with () group
-    <img\s(src=.*?)\s.*?>  # find src attribute with () group
+    href="(.*?)"\s.*?>       # find href attribute with () group
+    <img\ssrc="(.*?)"\s.*?>  # find src attribute with () group
     <div\s.*?>(.*?)</div>  # find contents of tag with () group
     <p>(.*?)</p>           # find contents of tag with () group
     </a>

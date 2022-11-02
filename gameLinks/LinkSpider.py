@@ -3,7 +3,7 @@ import time
 
 from selenium.webdriver.common.by import By
 
-from gameLinks.Seleniumer import Seleniumer
+from utils.Seleniumer import Seleniumer
 from utils.FileMaker import FileMaker
 
 
