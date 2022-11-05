@@ -12,4 +12,4 @@ if __name__ == '__main__':
     driver.auto_next_page(750)
 
     # parse game links and save to db
-    parse_game_links()
+    parse_game_links(dir_path='/Users/wukailang/Documents/GameZoneFiles/linksListFiles')
