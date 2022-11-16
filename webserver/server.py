@@ -1,15 +1,14 @@
 # connect dbms
 import json
 import math
-import sys
-import time
-from datetime import datetime
-import pprint
 import socket
+import sys
+from datetime import datetime
 
 from utils.DBmsConnect import DBmsConnect
 
-PAGE_SIZE = 3
+# 服务端固定每页50条数据
+PAGE_SIZE = 18
 
 
 def calculate_data_pages_and_total():
@@ -35,7 +34,8 @@ def make_data(current):
     # query detail based on game_id
     for row in data:
         val = row['game_id']
-        sql_detail = f"SELECT game_cn_name, \
+        sql_detail = f"SELECT game_id, \
+        game_cn_name, \
         game_original_name, \
         game_total_story_time, \
         game_release_date_and_platform, \
@@ -94,7 +94,7 @@ def run_server():
         # query path
         path = ''
         # query param
-        query_params = {}
+        query_params = {'current': 1}
         try:
             # query method
             method = request.split('\r\n')[0].split()[0]
@@ -123,13 +123,19 @@ def run_server():
             elif path.startswith('/api/list'):
                 header = 'Content-Type:text/json'
                 data_info = calculate_data_pages_and_total()
+                # 请求页数超过最大页数
+                if query_params['current'] > data_info['pages']:
+                    response = f'HTTP/1.1 403 Forbidden\n\nForbidden'
+                    client_connection.sendall(response.encode())
+                    client_connection.close()
+                    continue
                 records = {
                     'code': 0,
                     'status': 'ok',
                     'data': {
-                        'current': 1,
+                        'current': query_params['current'],
                         'page_size': PAGE_SIZE,
-                        'page': data_info['pages'],
+                        'pages': data_info['pages'],
                         'total': data_info['total'],
                         'records': make_data(query_params['current'])
                     }
