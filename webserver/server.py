@@ -8,7 +8,7 @@ from datetime import datetime
 from utils.DBmsConnect import DBmsConnect
 
 # 服务端固定每页50条数据
-PAGE_SIZE = 18
+PAGE_SIZE = 50
 
 
 def calculate_data_pages_and_total():
