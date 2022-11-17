@@ -17,7 +17,7 @@ class DetailSpider:
         dbms = DBmsConnect().dbms
         cursor = dbms.cursor()
         # query data from game_links table
-        cursor.execute('SELECT * FROM game_links LIMIT 5000 OFFSET 14550')
+        cursor.execute('SELECT * FROM game_links LIMIT 5000 OFFSET 16274')
         data = cursor.fetchall()
 
         # scrape detail page in for loop

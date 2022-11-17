@@ -5,10 +5,22 @@ import socket
 import sys
 from datetime import datetime
 
-from utils.DBmsConnect import DBmsConnect
+import mysql.connector
 
 # 服务端固定每页50条数据
 PAGE_SIZE = 50
+
+
+# DBmsConnect
+class DBmsConnect:
+
+    def __init__(self):
+        self.dbms = mysql.connector.connect(
+            host='1.12.59.12',
+            user='xws',
+            password='Yanzi@520',
+            database='game_zone'
+        )
 
 
 def calculate_data_pages_and_total():
@@ -55,7 +67,7 @@ def make_data(current):
 def run_server():
     # Define socket host and port
     SERVER_HOST = 'localhost'
-    SERVER_PORT = 1235
+    SERVER_PORT = 5555
 
     # Create socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -115,12 +127,7 @@ def run_server():
         response = ''
         # only support get method now
         if method == 'GET':
-            if path == '/':
-                header = 'Content-Type:text/html'
-                html_file = open('../index.html')
-                body = html_file.read()
-                html_file.close()
-            elif path.startswith('/api/list'):
+            if path.startswith('/api/list'):
                 header = 'Content-Type:text/json'
                 data_info = calculate_data_pages_and_total()
                 # 请求页数超过最大页数
