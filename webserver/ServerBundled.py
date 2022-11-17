@@ -66,7 +66,7 @@ def make_data(current):
 
 def run_server():
     # Define socket host and port
-    SERVER_HOST = 'localhost'
+    SERVER_HOST = '0.0.0.0'
     SERVER_PORT = 5555
 
     # Create socket
