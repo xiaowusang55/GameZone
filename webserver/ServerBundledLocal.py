@@ -24,8 +24,7 @@ class DBmsConnect:
 
 
 def calculate_data_pages_and_total():
-    dbms = DBmsConnect().dbms
-    cursor = dbms.cursor(dictionary=True)
+
     # query data from game_links table
     cursor.execute('SELECT game_id, game_name FROM game_links')
     data = cursor.fetchall()
@@ -34,9 +33,6 @@ def calculate_data_pages_and_total():
 
 def make_data(current):
     records = []
-
-    dbms = DBmsConnect().dbms
-    cursor = dbms.cursor(dictionary=True)
     # query data from game_links table
     offset = current * PAGE_SIZE - PAGE_SIZE
     sql = f'SELECT game_id, game_name FROM game_links LIMIT {PAGE_SIZE} OFFSET {offset}'
@@ -76,7 +72,6 @@ def run_server():
     server_socket.listen(10)
     print('Server running...')
     print(f'Listening on port {SERVER_PORT}')
-    data_info = calculate_data_pages_and_total()
 
     while True:
         # Wait for client connections
@@ -167,4 +162,9 @@ def run_server():
 
 
 if __name__ == '__main__':
+    # 连接数据库
+    dbms = DBmsConnect().dbms
+    cursor = dbms.cursor(dictionary=True)
+    # 获取列表总数信息
+    data_info = calculate_data_pages_and_total()
     run_server()
