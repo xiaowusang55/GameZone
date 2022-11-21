@@ -19,7 +19,7 @@ class FileMaker:
     def read(self):
         self.content = self.file.read()
         self.file.close()
-        print(f'{self.file.name} read succeed!')
+        # print(f'{self.file.name} read succeed!')
 
 
 if __name__ == '__main__':

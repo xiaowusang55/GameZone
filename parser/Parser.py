@@ -3,10 +3,12 @@ import os
 import re
 import uuid
 
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+
 from dataModel.GameDetailDM import GameDetailDM
 from utils.DBmsConnect import DBmsConnect
 from utils.MatchTxt import Matcher
-from bs4 import BeautifulSoup
 
 
 def parse_game_links(dir_path):
@@ -77,31 +79,30 @@ def parse_game_detail(dir_path):
                 full_path = os.path.join(dir_path, file)
                 list_item = (game_id, full_path)
                 if num is not None:
-                    original_order_list[int(num) - 1000 - 1] = list_item
-
+                    original_order_list[int(num) - 1] = list_item
     # connect to mysql
     dbms = DBmsConnect().dbms
     # create cursor
     mycursor = dbms.cursor()
 
     # create table
-    # mycursor.execute(
-    #     'CREATE TABLE game_details \
-    #         (id INT AUTO_INCREMENT PRIMARY KEY, \
-    #         game_id VARCHAR(225), \
-    #         game_cn_name VARCHAR(225), \
-    #         game_original_name VARCHAR(225), \
-    #         game_total_story_time VARCHAR(225), \
-    #         game_release_date_and_platform TEXT, \
-    #         game_type VARCHAR(225), \
-    #         game_is_cn_supported VARCHAR(225), \
-    #         game_producer VARCHAR(225), \
-    #         game_desc LONGTEXT, \
-    #         game_player_tags TEXT, \
-    #         game_pic_urls TEXT, \
-    #         created_time DATETIME, \
-    #         updated_time DATETIME)'
-    # )
+    mycursor.execute(
+        'CREATE TABLE game_details \
+            (id INT AUTO_INCREMENT PRIMARY KEY, \
+            game_id VARCHAR(225), \
+            game_cn_name VARCHAR(225), \
+            game_original_name VARCHAR(225), \
+            game_total_story_time VARCHAR(225), \
+            game_release_date_and_platform TEXT, \
+            game_type VARCHAR(225), \
+            game_is_cn_supported VARCHAR(225), \
+            game_producer VARCHAR(225), \
+            game_desc LONGTEXT, \
+            game_player_tags TEXT, \
+            game_pic_urls TEXT, \
+            created_time DATETIME, \
+            updated_time DATETIME)'
+    )
 
     sql = 'INSERT INTO game_details \
         (game_id, \
@@ -120,10 +121,18 @@ def parse_game_detail(dir_path):
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 
     # parse the file in a loop and save it to db
-    for (game_id, full_path) in original_order_list:
+    for i in tqdm(range(len(original_order_list))):
+        if isinstance(original_order_list[i], int):
+            continue
+
+        game_id, full_path = original_order_list[i]
         matcher = Matcher(full_path=full_path)
 
         game_cn_name_reg = r"""<div\sclass="tit_CH"\s.*?>(.*?)</div>"""
+
+        if matcher.re_search(game_cn_name_reg) is None:
+            continue
+
         game_original_name_reg = r"""<div\sclass="tit_EN".*?>(.*?)</div>"""
         game_total_story_time_reg = r"""<div.*?title="游戏时长">\s*?(.*?)\s*?</div>"""
 
@@ -160,7 +169,7 @@ def parse_game_detail(dir_path):
         # so to take a short path, use bs4 instead
         soup = BeautifulSoup(matcher.file.content, 'html.parser')
         game_desc_el = soup.find(class_="con-hide")
-        game_desc = game_desc_el.text.strip()
+        game_desc = game_desc_el.text.strip() if game_desc_el is not None else ''
 
         game_player_tags_reg = r"""
                 <a\starget="_blank"\shref="http://ku.gamersky.com/sp/
@@ -197,4 +206,4 @@ def parse_game_detail(dir_path):
 
 if __name__ == '__main__':
     # parse_game_detail(dir_path='/Users/wukailang/Documents/GameZoneFiles/detailFiles/1-1000/')
-    parse_game_detail(dir_path='/Users/wukailang/Documents/GameZoneFiles/detailFiles/1001-2000/')
+    parse_game_detail(dir_path='/Users/wukailang/Documents/GameZoneFiles/detailFiles/all')

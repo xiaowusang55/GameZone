@@ -17,7 +17,7 @@ class DetailSpider:
         dbms = DBmsConnect().dbms
         cursor = dbms.cursor()
         # query data from game_links table
-        cursor.execute('SELECT * FROM game_links LIMIT 5000 OFFSET 16532')
+        cursor.execute('SELECT * FROM game_links LIMIT 1000 OFFSET 0')
         data = cursor.fetchall()
 
         # scrape detail page in for loop
@@ -28,9 +28,9 @@ class DetailSpider:
             file_name = f'{id}_{game_name}_{game_id}'
             fm = FileMaker(f'{self.save_dir_path}{file_name}.txt', 'w')
             fm.write(self.driver.page_source)
-            time.sleep(random.randint(5, 10))
+            time.sleep(random.randint(2, 3))
 
 
 if __name__ == '__main__':
-    ds = DetailSpider(save_dir_path='/Users/wukailang/Documents/GameZoneFiles/detailFiles/')
+    ds = DetailSpider(save_dir_path='/Users/wukailang/Documents/GameZoneFiles/detailFiles/all')
     ds.run()
